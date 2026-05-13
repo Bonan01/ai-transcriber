@@ -1,5 +1,5 @@
 # ============================================================
-#  build.ps1 — AiTranscriber build script
+#  build.ps1 - AiTranscriber build script
 #  Run from the project root:  .\scripts\build.ps1
 # ============================================================
 
@@ -13,11 +13,11 @@ $DistDir     = Join-Path $ProjectRoot "dist\AiTranscriber"
 
 Write-Host ""
 Write-Host "======================================" -ForegroundColor Cyan
-Write-Host "  AiTranscriber — Build Script" -ForegroundColor Cyan
+Write-Host "  AiTranscriber - Build Script" -ForegroundColor Cyan
 Write-Host "======================================" -ForegroundColor Cyan
 Write-Host ""
 
-# ── 1. Check venv ────────────────────────────────────────────────────────────
+# - 1. Check venv -
 if (-not (Test-Path $VenvPython)) {
     Write-Host "[ERROR] Virtual environment not found at:" -ForegroundColor Red
     Write-Host "        $VenvPython" -ForegroundColor Red
@@ -31,7 +31,7 @@ if (-not (Test-Path $VenvPython)) {
 
 Write-Host "[1/5] Virtual environment found." -ForegroundColor Green
 
-# ── 2. Install / upgrade PyInstaller in venv ─────────────────────────────────
+# - 2. Install / upgrade PyInstaller in venv -
 Write-Host "[2/5] Installing / upgrading PyInstaller..." -ForegroundColor Yellow
 $pipJob = Start-Process -FilePath $VenvPip `
     -ArgumentList "install --upgrade pyinstaller" `
@@ -42,7 +42,7 @@ if ($pipJob.ExitCode -ne 0) {
 }
 Write-Host "       PyInstaller ready." -ForegroundColor Green
 
-# ── 3. Convert icon PNG -> ICO ───────────────────────────────────────────────
+# - 3. Convert icon PNG -> ICO -
 Write-Host "[3/5] Converting icon.png -> icon.ico..." -ForegroundColor Yellow
 $icoJob = Start-Process -FilePath $VenvPython `
     -ArgumentList "`"$MakeIco`"" `
@@ -53,7 +53,7 @@ if ($icoJob.ExitCode -ne 0) {
 }
 Write-Host "       Icon converted." -ForegroundColor Green
 
-# ── 4. Check frontend/out ────────────────────────────────────────────────────
+# - 4. Check frontend/out -
 $FrontendOut = Join-Path $ProjectRoot "frontend\out"
 if (-not (Test-Path $FrontendOut)) {
     Write-Host ""
@@ -62,11 +62,11 @@ if (-not (Test-Path $FrontendOut)) {
     Write-Host "            cd '$ProjectRoot\frontend'" -ForegroundColor Yellow
     Write-Host "            npm run build" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "          Continuing without frontend — the exe will not show UI." -ForegroundColor Yellow
+    Write-Host "          Continuing without frontend - the exe will not show UI." -ForegroundColor Yellow
     Write-Host ""
 }
 
-# ── 5. Run PyInstaller ───────────────────────────────────────────────────────
+# - 5. Run PyInstaller -
 $PyInstaller = Join-Path $ProjectRoot "backend\venv\Scripts\pyinstaller.exe"
 Write-Host "[4/5] Running PyInstaller (this may take a few minutes)..." -ForegroundColor Yellow
 Write-Host "      Spec: $SpecFile" -ForegroundColor DarkGray
@@ -82,7 +82,7 @@ if ($buildJob.ExitCode -ne 0) {
     exit 1
 }
 
-# ── 6. Add version to executable name ────────────────────────────────────────
+# - 6. Add version to executable name -
 $VersionFile = Join-Path $ProjectRoot "backend\version.py"
 $AppVersion = "Unknown"
 if (Test-Path $VersionFile) {
@@ -99,7 +99,7 @@ if (Test-Path $OldExe) {
     Rename-Item $OldExe $NewExeName -Force
 }
 
-# ── 7. Copy models folder symlink hint ──────────────────────────────────────
+# - 7. Copy models folder symlink hint -
 Write-Host ""
 Write-Host "[5/5] Build complete!" -ForegroundColor Green
 Write-Host ""
@@ -112,7 +112,7 @@ Write-Host ""
 Write-Host "  Or you can let the app download models on first run via the UI." -ForegroundColor DarkGray
 Write-Host ""
 
-# ── 8. Optionally create desktop shortcut ────────────────────────────────────
+# - 8. Optionally create desktop shortcut -
 $CreateShortcut = Read-Host "Create desktop shortcut? (y/n)"
 if ($CreateShortcut -eq 'y' -or $CreateShortcut -eq 'Y') {
     $DesktopPath = [Environment]::GetFolderPath("Desktop")

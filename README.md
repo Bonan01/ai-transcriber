@@ -1,49 +1,144 @@
-# AI Transcriber
+<p align="center">
+  <img src="assets/icon.png" alt="AI Transcriber" width="128" />
+</p>
 
-A professional desktop application for fast, offline transcription using local AI models (faster-whisper).
+<h1 align="center">AI Transcriber</h1>
 
-## Features
-- Fully offline transcription ensures data privacy.
-- Hardware acceleration (CUDA) support out of the box.
-- Built with Python (FastAPI backend) and Next.js (Frontend).
-- Local model management interface.
-- System tray integration for easy access.
+<p align="center">
+  Fast, offline audio transcription powered by local AI models.
+</p>
+
+<p align="center">
+  <a href="https://github.com/Bonan01/ai-transcriber/releases"><img src="https://img.shields.io/github/v/release/Bonan01/ai-transcriber?style=flat-square" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Bonan01/ai-transcriber?style=flat-square" alt="License"></a>
+  <img src="https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square" alt="Python">
+  <img src="https://img.shields.io/badge/platform-Windows-lightgrey?style=flat-square" alt="Platform">
+</p>
+
+---
+
+## About
+
+AI Transcriber is a desktop application that transcribes audio files **entirely on your machine** — no internet connection or cloud API required. It uses [faster-whisper](https://github.com/SYSTRAN/faster-whisper) (CTranslate2) for high-performance inference with optional CUDA GPU acceleration.
+
+### Key Features
+
+- 🔒 **Fully offline** — your audio never leaves your computer
+- ⚡ **GPU-accelerated** — CUDA support for fast transcription
+- 🎛️ **Model Manager** — download, switch, and delete Whisper models from the UI
+- 📂 **Multi-file queue** — drag & drop multiple files, process them sequentially
+- ✏️ **Built-in editor** — review and edit transcription results before saving
+- 🔔 **System tray** — runs in background, notifies on completion
+- 📤 **Export formats** — save as `.txt` or `.srt` (subtitles)
+- 🗣️ **Speaker diarization** — optional, with a Hugging Face token
+
+---
+
+## Quick Start
+
+### Download
+
+Grab the latest release from the [Releases page](https://github.com/Bonan01/ai-transcriber/releases) — it's a portable Windows executable, no installation needed.
+
+1. Extract the archive
+2. Run `AiTranscriber.exe`
+3. Download a Whisper model from the **Model Manager** tab
+4. Drop an audio file and transcribe!
+
+---
 
 ## Development
 
-### Requirements
-- Python 3.10+
-- Node.js 18+
-- Git
+### Prerequisites
+
+| Tool | Version |
+|------|---------|
+| Python | 3.10+ |
+| Node.js | 18+ |
+| Git | any |
 
 ### Setup
-1. Clone the repository.
-2. Install backend dependencies:
-   ```bash
-   cd backend
-   python -m venv venv
-   venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-3. Install frontend dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
+
+```bash
+# Clone the repository
+git clone https://github.com/Bonan01/ai-transcriber.git
+cd ai-transcriber
+
+# Backend
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r ..\requirements.txt
+
+# Frontend
+cd ..\frontend
+npm install
+```
 
 ### Running Locally
-1. Start the frontend:
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-2. Start the backend/desktop app:
-   ```bash
-   python app.py
-   ```
+
+```bash
+# Terminal 1 — Frontend dev server (optional, for hot reload)
+cd frontend
+npm run dev
+
+# Terminal 2 — Desktop app
+python app.py
+```
 
 ### Building for Production
-Run the included PowerShell script to bundle the application into a standalone `.exe`:
+
+Build a standalone `.exe` using the included scripts:
+
 ```powershell
+# Option A — Full build (frontend + exe)
+.\MakeBuild.bat
+
+# Option B — Exe only (assumes frontend is already built)
 .\scripts\build.ps1
 ```
+
+Output: `dist/AiTranscriber/AiTranscriber_vX.Y.Z.exe`
+
+---
+
+## Architecture
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for a detailed overview.
+
+```
+app.py (entry point)
+├── pywebview        → GUI shell (Edge WebView2)
+├── pystray          → system tray icon
+└── FastAPI (uvicorn :8000)
+    ├── Next.js static frontend (served from frontend/out/)
+    ├── /upload, /ws → transcription (multiprocessing + faster-whisper)
+    ├── /models      → model management
+    └── /system      → version, CUDA status
+```
+
+---
+
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/). The version is managed centrally in [`pyproject.toml`](pyproject.toml) and synchronized across the codebase using:
+
+```bash
+python scripts/bump_version.py patch   # 1.0.0 → 1.0.1
+python scripts/bump_version.py minor   # 1.0.0 → 1.1.0
+python scripts/bump_version.py major   # 1.0.0 → 2.0.0
+```
+
+See the [Changelog](CHANGELOG.md) for release history.
+
+---
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## License
+
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.

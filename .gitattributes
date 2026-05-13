@@ -1,0 +1,37 @@
+# Auto-detect text files and ensure LF line endings everywhere.
+* text=auto eol=lf
+
+# Explicitly declare text files
+*.py        text diff=python
+*.ts        text
+*.tsx       text
+*.js        text
+*.jsx       text
+*.json      text
+*.toml      text
+*.md        text diff=markdown
+*.yml       text
+*.yaml      text
+*.css       text
+*.html      text
+*.txt       text
+*.cfg       text
+*.ini       text
+*.bat       text eol=crlf
+*.ps1       text eol=crlf
+*.cmd       text eol=crlf
+
+# Explicitly declare binary files
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.eot       binary
+*.exe       binary
+*.dll       binary
+*.so        binary
+*.dylib     binary

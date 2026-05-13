@@ -1,0 +1,16 @@
+[project]
+name = "AiTranscriber"
+version = "1.0.0"
+description = "Offline AI-powered audio transcription desktop app using faster-whisper"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Bonan01" }
+]
+readme = "README.md"
+keywords = ["transcription", "whisper", "ai", "offline", "desktop"]
+
+[tool.pyright]
+venvPath = "./backend"
+venv = "venv"
+pythonVersion = "3.10"
