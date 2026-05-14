@@ -38,11 +38,20 @@ AI Transcriber is a desktop application that transcribes audio files **entirely 
 
 ### Download
 
-Grab the latest release from the [Releases page](https://github.com/Bonan01/ai-transcriber/releases) — it's a portable Windows executable, no installation needed.
+Go to the [Releases page](https://github.com/Bonan01/ai-transcriber/releases) and download the archive that matches your hardware:
 
-1. Extract the archive
-2. Run `AiTranscriber.exe`
-3. Download a Whisper model from the **Model Manager** tab
+| Archive | Size | Description |
+|---------|------|-------------|
+| `AiTranscriber_v*_CUDA.zip` | ~630 MB | **Recommended** if you have an NVIDIA GPU — includes CUDA libraries for fast transcription |
+| `AiTranscriber_v*_CPU.zip` | ~100 MB | Lightweight CPU-only version — works on any Windows 10/11 machine |
+
+> **Note:** Whisper models are **not included** in the download. The app will prompt you to download one (~150–1500 MB depending on model size) on first launch via the built-in Model Manager.
+
+### Getting Started
+
+1. Extract the archive to any folder
+2. Run `AiTranscriber_vX.Y.Z.exe`
+3. Go to the **Model Manager** tab and download a Whisper model (e.g. `small` or `medium`)
 4. Drop an audio file and transcribe!
 
 ---
