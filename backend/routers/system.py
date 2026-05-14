@@ -1,10 +1,36 @@
 import sys
 import asyncio
+import threading
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from backend.version import __version__
 
 router = APIRouter(prefix="/system", tags=["system"])
+
+# --- Single-instance support ---
+# When a second process detects the app is already running,
+# it sends POST /system/show to signal the first instance to show its window.
+_show_window_lock = threading.Lock()
+_show_window_pending = False
+
+
+@router.post("/show")
+async def request_show_window():
+    """Signal the running instance to bring its window to front."""
+    global _show_window_pending
+    with _show_window_lock:
+        _show_window_pending = True
+    return {"status": "ok"}
+
+
+@router.get("/show-pending")
+async def check_show_pending():
+    """Polled by app.py to know when to call window.show()."""
+    global _show_window_pending
+    with _show_window_lock:
+        pending = _show_window_pending
+        _show_window_pending = False
+    return {"pending": pending}
 
 @router.get("/version")
 async def get_version():

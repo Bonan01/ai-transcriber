@@ -40,10 +40,10 @@ export default function Home() {
       <main className="min-h-screen p-6 lg:p-12 flex flex-col items-center justify-center relative overflow-hidden h-screen max-h-screen">
 
         {/* Animated background blobs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[var(--accent)] opacity-20 blur-[120px] pointer-events-none transition-all duration-500" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 blur-[120px] pointer-events-none transition-all duration-500" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[var(--accent)] opacity-20 blur-[80px] pointer-events-none transition-all duration-500" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 blur-[80px] pointer-events-none transition-all duration-500" />
 
-        <div className="w-full h-full max-w-7xl z-10 flex flex-col space-y-6">
+        <div className="w-full h-full z-10 flex flex-col space-y-6">
 
           {/* ── Header ── */}
           <header className="flex items-center justify-between shrink-0">

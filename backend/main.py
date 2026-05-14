@@ -8,8 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-# Required for PyInstaller frozen executables on Windows
-mp.freeze_support()
+# NOTE: mp.freeze_support() is intentionally NOT called here.
+# It MUST only be called in app.py's if __name__ == '__main__' block (line 105).
+# Calling it at module level causes 'Can't get attribute transcribe_worker'
+# in frozen PyInstaller builds because the child process tries to unpickle
+# the worker function before backend.routers.transcription is imported.
 
 from backend.config import APP_DATA_DIR
 from backend.routers import system, models, transcription

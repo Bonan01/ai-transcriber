@@ -3,6 +3,47 @@ import sys
 import threading
 import time
 import multiprocessing
+import ctypes
+import logging
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Single-instance check (Windows named mutex)
+# Must run BEFORE any heavy imports to fail fast on duplicate launch.
+# ---------------------------------------------------------------------------
+MUTEX_NAME = "Global\\AiTranscriberSingleInstance"
+_mutex_handle = None  # kept alive for process lifetime
+
+
+def _try_acquire_mutex() -> bool:
+    """Try to create a named mutex. Returns True if this is the first instance."""
+    global _mutex_handle
+    kernel32 = ctypes.windll.kernel32
+    ERROR_ALREADY_EXISTS = 183
+    _mutex_handle = kernel32.CreateMutexW(None, False, MUTEX_NAME)
+    return kernel32.GetLastError() != ERROR_ALREADY_EXISTS
+
+
+def _signal_existing_instance():
+    """Tell the already-running instance to show its window, then exit."""
+    import urllib.request
+    try:
+        req = urllib.request.Request(
+            "http://127.0.0.1:8000/system/show",
+            method="POST",
+            data=b"",
+        )
+        urllib.request.urlopen(req, timeout=3)
+        logger.info("Signalled existing instance to show window.")
+    except Exception:
+        logger.warning("Could not reach existing instance — it may have crashed.")
+    sys.exit(0)
+
+
+# ---------------------------------------------------------------------------
+# Application imports (after mutex gate to avoid slow loads on duplicate)
+# ---------------------------------------------------------------------------
 import uvicorn
 import webview
 from backend.main import app as fastapi_app
@@ -99,10 +140,44 @@ def start_server():
     uvicorn.run(fastapi_app, host="127.0.0.1", port=8000, log_level="error")
 
 
+def poll_show_window(window):
+    """
+    Polls /system/show-pending every 2 seconds.
+    When another instance tries to launch, it POSTs to /system/show
+    and this thread picks up the signal and brings the window to front.
+    """
+    import urllib.request
+    import json
+
+    while True:
+        time.sleep(2)
+        try:
+            resp = urllib.request.urlopen(
+                "http://127.0.0.1:8000/system/show-pending",
+                timeout=2,
+            )
+            data = json.loads(resp.read())
+            if data.get("pending"):
+                window.show()
+                # Also try to restore/bring to front
+                try:
+                    window.restore()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+
 if __name__ == '__main__':
     # REQUIRED for PyInstaller + multiprocessing on Windows.
     # Must be called immediately at the top of __main__.
     multiprocessing.freeze_support()
+
+    # --- Single-instance gate ---
+    if not _try_acquire_mutex():
+        _signal_existing_instance()
+        # _signal_existing_instance calls sys.exit(0), but just in case:
+        sys.exit(0)
 
     frontend_out = os.path.join(BASE_DIR, "frontend", "out")
     if not os.path.exists(frontend_out):
@@ -133,6 +208,10 @@ if __name__ == '__main__':
         return False
 
     window.events.closing += on_closing
+
+    # Start polling for show-window signals from duplicate launches
+    show_poller = threading.Thread(target=poll_show_window, args=(window,), daemon=True)
+    show_poller.start()
 
     def setup_tray():
         def show_window(icon, item):
